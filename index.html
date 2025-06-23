@@ -165,10 +165,6 @@
 <script>
     const scriptBaseURL = "https://script.google.com/macros/s/AKfycbwyY6rjfHnX3ScEKYQiYOx6AXH1Vq16qsxu3vQoCFExEmePvJyyCeLz7-zoF2ROkL1lYA/exec";
     const npm = localStorage.getItem("npm");
-    if (!npm) {
-      alert("NPM tidak ditemukan. Silakan login kembali.");
-      window.location.href = "##";
-    }
 
     let fullSaldo = "", saldoVisible = true;
     const saldoText = document.getElementById("saldoText");
