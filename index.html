@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard Joki Tugas</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(to bottom, #1e3c72, #2a5298);
+      min-height: 100vh;
+      transition: all 0.3s ease-in-out;
+    }
+    .icon-box {
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .icon-box:hover {
+      transform: translateY(-4px) scale(1.05);
+      box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+    }
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-slideDown {
+      animation: slideDown 0.4s ease-out;
+    }
+  </style>
+</head>
+<body class="text-white">
+
+  <!-- Header -->
+  <div class="px-6 pt-8 pb-4 flex justify-between items-start">
+    <div>
+      <p class="text-sm text-white/70">Selamat Malam,</p>
+      <h1 class="text-2xl font-semibold">Renaldi</h1>
+    </div>
+    <div class="flex space-x-4 items-start text-sm">
+      <button class="text-xl hover:scale-110 transition">🔔</button>
+      <button class="underline hover:text-blue-300 transition">Bantuan</button>
+    </div>
+  </div>
+
+  <!-- Info Joki -->
+  <div class="bg-white text-gray-900 mx-5 mt-4 rounded-2xl shadow-2xl p-6">
+    <p class="text-sm text-gray-500">Total Tagihan Aktif</p>
+    <div class="flex justify-between items-center mt-2">
+      <p id="saldoText" class="text-3xl font-bold text-blue-600">Rp75.000</p>
+      <button id="toggleSaldoBtn" class="text-blue-600 text-2xl hover:scale-110 transition">👁</button>
+    </div>
+    <div class="mt-3">
+      <a href="#" class="text-sm text-blue-500 font-semibold hover:underline">Lihat Semua Tugas →</a>
+    </div>
+  </div>
+
+  <!-- Menu -->
+  <div class="bg-white mt-6 mx-5 rounded-2xl p-6 grid grid-cols-2 sm:grid-cols-4 gap-5 text-center shadow-md">
+    <div class="space-y-2 icon-box cursor-pointer" id="btnTambahTugas">
+      <div class="bg-blue-100 text-blue-600 p-4 rounded-full mx-auto text-xl shadow-inner">📝</div>
+      <p class="text-base font-bold text-gray-800">Tambah Tugas</p>
+    </div>
+    <div class="space-y-2 icon-box cursor-pointer" id="btnRiwayat">
+      <div class="bg-blue-100 text-blue-600 p-4 rounded-full mx-auto text-xl shadow-inner">📄</div>
+      <p class="text-base font-bold text-gray-800">Riwayat</p>
+    </div>
+    <div class="space-y-2 icon-box cursor-pointer" id="btnPembayaran">
+      <div class="bg-blue-100 text-blue-600 p-4 rounded-full mx-auto text-xl shadow-inner">💳</div>
+      <p class="text-base font-bold text-gray-800">Pembayaran</p>
+    </div>
+    <div class="space-y-2 icon-box cursor-pointer" id="btnPengaturan">
+      <div class="bg-blue-100 text-blue-600 p-4 rounded-full mx-auto text-xl shadow-inner">⚙️</div>
+      <p class="text-base font-bold text-gray-800">Pengaturan</p>
+    </div>
+  </div>
+
+  <!-- Sections -->
+  <div id="formTambahTugas" class="hidden bg-white text-gray-800 mx-5 mb-10 mt-6 rounded-2xl shadow-xl p-6 transition-all duration-500">
+    <h2 class="text-lg font-semibold mb-4 text-blue-700">Form Tambah Tugas</h2>
+    <form class="space-y-4">
+      <div>
+        <label class="block text-sm font-medium mb-1">Jenis Tugas</label>
+        <select id="jenisTugas" class="w-full p-2 border rounded-md bg-white text-gray-700">
+          <option value="" disabled selected>Pilih jenis tugas</option>
+          <option value="MAKALAH">MAKALAH</option>
+          <option value="PPT">PPT</option>
+          <option value="PPT PREMIUM">PPT PREMIUM</option>
+          <option value="KODING">KODING</option>
+          <option value="ANIMACY">ANIMACY</option>
+          <option value="WEBSITE">WEBSITE</option>
+          <option value="APLIKASI">APLIKASI</option>
+        </select>
+      </div>
+      <div>
+        <label class="block text-sm font-medium mb-1">Pilih Admin Joki</label>
+        <select id="adminSelect" class="w-full p-2 border rounded-md bg-white text-gray-700">
+          <option value="" disabled selected>Pilih admin</option>
+          <option value="RENALDI">RENALDI</option>
+          <option value="AFRIZAL">AFRIZAL</option>
+          <option value="ABDUL HAKIM">ABDUL HAKIM</option>
+          <option value="AIDIL ANWAR">AIDIL ANWAR</option>
+        </select>
+      </div>
+      <div>
+        <label class="block text-sm font-medium mb-1">Metode Pembayaran (Dana)</label>
+        <input id="metodePembayaran" type="text" class="w-full p-2 border rounded-md bg-gray-100 cursor-not-allowed" readonly />
+      </div>
+      <div><label class="block text-sm font-medium mb-1">Judul Tugas</label><input type="text" class="w-full p-2 border rounded-md" placeholder="Masukkan judul tugas" /></div>
+      <div><label class="block text-sm font-medium mb-1">Deskripsi</label><textarea class="w-full p-2 border rounded-md" rows="4" placeholder="Deskripsikan tugas..."></textarea></div>
+      <div><label class="block text-sm font-medium mb-1">Nama Lengkap Dosen</label><input type="text" class="w-full p-2 border rounded-md" placeholder="Contoh: Dr. Ahmad Yusuf, M.Pd" /></div>
+      <div><label class="block text-sm font-medium mb-1">Fakultas</label><input type="text" class="w-full p-2 border rounded-md" placeholder="Contoh: Teknik, Hukum" /></div>
+      <div><label class="block text-sm font-medium mb-1">Mata Kuliah</label><input type="text" class="w-full p-2 border rounded-md" placeholder="Contoh: Pemrograman Web" /></div>
+      <div><label class="block text-sm font-medium mb-1">Deadline</label><input type="date" class="w-full p-2 border rounded-md" /></div>
+      <div>
+        <label class="block text-sm font-medium mb-1">Harga (Rp)</label>
+        <div class="flex items-center bg-blue-100 text-blue-700 font-bold rounded-md px-4 py-3">
+          <span class="text-lg mr-2">💰</span>
+          <input id="hargaInput" type="text" readonly class="bg-transparent text-xl w-full focus:outline-none cursor-not-allowed" />
+        </div>
+      </div>
+      <div><label class="block text-sm font-medium mb-1">Upload Bukti Pembayaran</label><input type="file" class="w-full p-2 border rounded-md bg-white" accept="image/*" /></div>
+      <div class="pt-4"><button type="submit" class="w-full bg-blue-600 text-white py-2 rounded-md font-semibold hover:bg-blue-700 transition">Kirim Tugas</button></div>
+    </form>
+  </div>
+
+  <div id="riwayatTugasSection" class="hidden mx-5 my-8 text-gray-900">
+    <h2 class="text-lg font-semibold text-white mb-4">Riwayat Tugas</h2>
+    <div id="riwayatList" class="space-y-4"></div>
+  </div>
+
+  <div id="pembayaranSection" class="hidden mx-5 my-8 text-gray-900">
+    <h2 class="text-lg font-semibold text-white mb-4">Riwayat Pembayaran</h2>
+    <div id="pembayaranList" class="space-y-4"></div>
+  </div>
+
+  <div id="pengaturanSection" class="hidden mx-5 my-8 text-gray-900">
+    <h2 class="text-lg font-semibold text-white mb-4">Pengaturan Akun</h2>
+    <div class="bg-white rounded-xl shadow p-4 space-y-4 text-sm">
+      <div><label class="block font-medium mb-1">Nama</label><input id="namaPengguna" type="text" class="w-full p-2 border rounded-md" value="Renaldi" /></div>
+      <div><label class="block font-medium mb-1">Password Baru</label><input id="passwordBaru" type="password" class="w-full p-2 border rounded-md" placeholder="••••••••" /></div>
+      <button class="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition">Simpan Perubahan</button>
+    </div>
+  </div>
+
+  <!-- Script -->
+<script>
+  const scriptBaseURL = "https://script.google.com/macros/s/AKfycbwyY6rjfHnX3ScEKYQiYOx6AXH1Vq16qsxu3vQoCFExEmePvJyyCeLz7-zoF2ROkL1lYA/exec";
+  const npm = localStorage.getItem("npm");
+
+  if (!npm) {
+    alert("NPM tidak ditemukan. Silakan login kembali.");
+    window.location.href = "botjokitugas.html"; // Ganti jika login ada di file lain
+  }
+
+  // Ambil data user
+  fetch(`${scriptBaseURL}?action=getUser&npm=${npm}`)
+    .then(res => res.json())
+    .then(data => {
+      if (data && data.nama) {
+        document.getElementById("userName").textContent = data.nama;
+        document.getElementById("userProdi").textContent = data.prodi || "";
+        localStorage.setItem("nama", data.nama);
+        localStorage.setItem("prodi", data.prodi);
+      }
+    });
+
+  // Ambil saldo
+  let fullSaldo = "";
+  let saldoVisible = true;
+  const saldoText = document.getElementById("saldoText");
+  const toggleBtn = document.getElementById("toggleSaldoBtn");
+
+  function updateSaldo() {
+    fetch(`${scriptBaseURL}?action=getSaldo&npm=${npm}`)
+      .then(res => res.json())
+      .then(data => {
+        const saldo = data && data.saldo ? `Rp${Number(data.saldo).toLocaleString("id-ID")}` : "Rp0";
+        saldoText.textContent = saldo;
+        fullSaldo = saldo;
+      });
+  }
+
+  toggleBtn.addEventListener("click", () => {
+    saldoVisible = !saldoVisible;
+    saldoText.textContent = saldoVisible ? fullSaldo : "•••••••••";
+    toggleBtn.textContent = saldoVisible ? "👁" : "🙈";
+  });
+
+  updateSaldo();
+
+  // Navigasi
+  const formTambahTugas = document.getElementById("formTambahTugas");
+  const riwayatTugasSection = document.getElementById("riwayatTugasSection");
+  const pembayaranSection = document.getElementById("pembayaranSection");
+  const pengaturanSection = document.getElementById("pengaturanSection");
+
+  document.getElementById("btnTambahTugas").addEventListener("click", () => {
+    hideAllSections();
+    formTambahTugas.classList.remove("hidden");
+    formTambahTugas.classList.add("animate-slideDown");
+    formTambahTugas.scrollIntoView({ behavior: "smooth" });
+  });
+
+  document.getElementById("btnRiwayat").addEventListener("click", () => {
+    hideAllSections();
+    riwayatTugasSection.classList.remove("hidden");
+    fetchRiwayatTugas();
+    riwayatTugasSection.scrollIntoView({ behavior: "smooth" });
+  });
+
+  document.getElementById("btnPembayaran").addEventListener("click", () => {
+    hideAllSections();
+    pembayaranSection.classList.remove("hidden");
+    fetchPembayaran();
+    pembayaranSection.scrollIntoView({ behavior: "smooth" });
+  });
+
+  document.getElementById("btnPengaturan").addEventListener("click", () => {
+    hideAllSections();
+    pengaturanSection.classList.remove("hidden");
+    pengaturanSection.scrollIntoView({ behavior: "smooth" });
+  });
+
+  function hideAllSections() {
+    formTambahTugas.classList.add("hidden");
+    riwayatTugasSection.classList.add("hidden");
+    pembayaranSection.classList.add("hidden");
+    pengaturanSection.classList.add("hidden");
+  }
+
+  // Harga dan admin mapping
+  const hargaMap = {
+    "MAKALAH": 25000, "PPT": 25000, "PPT PREMIUM": 50000,
+    "KODING": 75000, "ANIMACY": 50000, "WEBSITE": 120000, "APLIKASI": 500000
+  };
+
+  const adminDanaMap = {
+    "RENALDI": "081348722325", "AFRIZAL": "085182489261",
+    "ABDUL HAKIM": "085764534425", "AIDIL ANWAR": "082279458613"
+  };
+
+  document.getElementById("jenisTugas").addEventListener("change", e => {
+    const harga = hargaMap[e.target.value] || 0;
+    document.getElementById("hargaInput").value = "Rp " + harga.toLocaleString("id-ID");
+  });
+
+  document.getElementById("adminSelect").addEventListener("change", e => {
+    document.getElementById("metodePembayaran").value = adminDanaMap[e.target.value] || "";
+  });
+
+  // Ambil riwayat tugas
+  function fetchRiwayatTugas() {
+    const riwayatList = document.getElementById("riwayatList");
+    riwayatList.innerHTML = "<p class='text-white'>Memuat data...</p>";
+
+    fetch(`${scriptBaseURL}?action=riwayat&npm=${npm}`)
+      .then(res => res.json())
+      .then(data => {
+        riwayatList.innerHTML = "";
+        if (!data || data.length === 0) {
+          riwayatList.innerHTML = "<p class='text-white'>Belum ada riwayat tugas.</p>";
+          return;
+        }
+        data.forEach(item => {
+          const el = document.createElement("div");
+          el.className = "bg-white rounded-xl shadow p-4 text-sm text-gray-800";
+          el.innerHTML = `
+            <div class="flex justify-between items-center mb-2">
+              <span class="font-bold text-blue-600">${item.jenis}</span>
+              <span class="px-2 py-1 rounded-full text-xs ${getStatusColor(item.status)}">${item.status}</span>
+            </div>
+            <p class="font-semibold">${item.judul}</p>
+            <p class="text-gray-500">Deadline: ${item.deadline}</p>
+            <p class="text-gray-500">Admin: ${item.admin}</p>
+          `;
+          riwayatList.appendChild(el);
+        });
+      })
+      .catch(() => riwayatList.innerHTML = "<p class='text-white'>Gagal memuat data.</p>");
+  }
+
+  function getStatusColor(status) {
+    switch (status.toLowerCase()) {
+      case "selesai": return "bg-green-100 text-green-700";
+      case "diproses": return "bg-yellow-100 text-yellow-700";
+      case "batal": return "bg-red-100 text-red-700";
+      default: return "bg-gray-100 text-gray-700";
+    }
+  }
+
+  // Ambil riwayat pembayaran
+  function fetchPembayaran() {
+    const pembayaranList = document.getElementById("pembayaranList");
+    pembayaranList.innerHTML = "<p class='text-white'>Memuat data...</p>";
+
+    fetch(`${scriptBaseURL}?action=pembayaran&npm=${npm}`)
+      .then(res => res.json())
+      .then(data => {
+        pembayaranList.innerHTML = "";
+        if (!data || data.length === 0) {
+          pembayaranList.innerHTML = "<p class='text-white'>Belum ada data pembayaran.</p>";
+          return;
+        }
+        data.forEach(item => {
+          const el = document.createElement("div");
+          el.className = "bg-white rounded-xl shadow p-4 text-sm text-gray-800";
+          el.innerHTML = `
+            <div class="flex justify-between mb-2">
+              <span class="font-semibold text-blue-600">${item.metode}</span>
+              <span class="text-xs text-gray-500">${item.tanggal}</span>
+            </div>
+            <p>Jumlah: <span class="font-bold text-green-600">${item.jumlah}</span></p>
+            <p>Status: <span class="font-semibold">${item.status}</span></p>
+          `;
+          pembayaranList.appendChild(el);
+        });
+      })
+      .catch(() => pembayaranList.innerHTML = "<p class='text-white'>Gagal memuat data.</p>");
+  }
+
+  // Submit form tugas
+  formTambahTugas.querySelector("form").addEventListener("submit", e => {
+    e.preventDefault();
+    const form = e.target;
+
+    const data = {
+      action: "tambahTugas",
+      npm,
+      jenis: form.jenisTugas.value,
+      judul: form.querySelector("input[placeholder='Masukkan judul tugas']").value,
+      deskripsi: form.querySelector("textarea").value,
+      dosen: form.querySelector("input[placeholder*='Ahmad Yusuf']").value,
+      fakultas: form.querySelector("input[placeholder='Contoh: Teknik, Hukum']").value,
+      matkul: form.querySelector("input[placeholder='Contoh: Pemrograman Web']").value,
+      deadline: form.querySelector("input[type='date']").value,
+      admin: form.adminSelect.value,
+      harga: document.getElementById("hargaInput").value,
+      metode: document.getElementById("metodePembayaran").value
+    };
+
+    fetch(scriptBaseURL, {
+      method: "POST",
+      body: JSON.stringify(data)
+    }).then(() => {
+      alert("Tugas berhasil dikirim!");
+      form.reset();
+      hideAllSections();
+      fetchRiwayatTugas();
+      updateSaldo();
+    });
+  });
+</script>
+
+
+</body>
+</html>
