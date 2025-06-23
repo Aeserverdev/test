@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login & Daftar Mahasiswa</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-blue-100 min-h-screen flex items-center justify-center">
+  <div class="bg-white p-8 rounded-xl shadow-xl w-full max-w-md space-y-6">
+    <h2 id="judulForm" class="text-center text-2xl font-bold text-blue-700">Login Mahasiswa</h2>
+
+    <!-- Form Login -->
+    <div id="loginForm" class="space-y-4">
+      <input id="loginNPM" type="text" placeholder="NPM" class="w-full p-3 border rounded-md" required>
+      <input id="loginPassword" type="password" placeholder="Password" class="w-full p-3 border rounded-md" required>
+      <button onclick="login()" class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700">Login</button>
+      <p class="text-sm text-center">Belum punya akun? <button onclick="showDaftar()" class="text-blue-600 hover:underline">Daftar</button></p>
+    </div>
+
+    <!-- Form Daftar -->
+    <div id="daftarForm" class="space-y-4 hidden">
+      <input id="daftarNPM" type="text" placeholder="NPM" class="w-full p-3 border rounded-md" required>
+      <input id="daftarPassword" type="password" placeholder="Password" class="w-full p-3 border rounded-md" required>
+      <input id="daftarNama" type="text" placeholder="Nama Lengkap" class="w-full p-3 border rounded-md" required>
+      <input id="daftarProdi" type="text" placeholder="Program Studi" class="w-full p-3 border rounded-md" required>
+      <button onclick="daftar()" class="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700">Daftar</button>
+      <p class="text-sm text-center">Sudah punya akun? <button onclick="showLogin()" class="text-blue-600 hover:underline">Login</button></p>
+    </div>
+
+    <p id="pesan" class="text-center text-sm text-red-500"></p>
+  </div>
+
+  <script>
+    const scriptURL = "https://script.google.com/macros/s/AKfycby15_oD-bvIPKIqPKx22dnFe3dNM2cYI-db78fWgd6su3AB_p32fB6Mqfe6oyAli0R6/exec"; // GANTI DENGAN LINK WEB APP KAMU
+
+    function showLogin() {
+      document.getElementById("judulForm").textContent = "Login Mahasiswa";
+      document.getElementById("loginForm").classList.remove("hidden");
+      document.getElementById("daftarForm").classList.add("hidden");
+      clearPesan();
+    }
+
+    function showDaftar() {
+      document.getElementById("judulForm").textContent = "Daftar Mahasiswa";
+      document.getElementById("loginForm").classList.add("hidden");
+      document.getElementById("daftarForm").classList.remove("hidden");
+      clearPesan();
+    }
+
+    function clearPesan() {
+      document.getElementById("pesan").textContent = "";
+    }
+
+    function tampilkanPesan(msg, type = "error") {
+      const pesan = document.getElementById("pesan");
+      pesan.textContent = msg;
+      pesan.className = `text-center text-sm ${type === "success" ? "text-green-600" : "text-red-500"}`;
+    }
+
+    function login() {
+      const npm = document.getElementById("loginNPM").value.trim();
+      const password = document.getElementById("loginPassword").value.trim();
+
+      if (!npm || !password) {
+        tampilkanPesan("NPM dan Password wajib diisi.");
+        return;
+      }
+
+      if (!/^\d+$/.test(npm)) {
+        tampilkanPesan("NPM hanya boleh angka.");
+        return;
+      }
+
+      fetch(`${scriptURL}?action=login&npm=${npm}&password=${password}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            localStorage.setItem("npm", npm);
+            localStorage.setItem("nama", data.nama);
+            localStorage.setItem("prodi", data.prodi);
+            window.location.href = "fjoki.html"; // redirect ke dashboard
+          } else {
+            tampilkanPesan("Login gagal! NPM atau Password salah.");
+          }
+        })
+        .catch(() => tampilkanPesan("Terjadi kesalahan. Coba lagi."));
+    }
+
+    function daftar() {
+      const npm = document.getElementById("daftarNPM").value.trim();
+      const password = document.getElementById("daftarPassword").value.trim();
+      const nama = document.getElementById("daftarNama").value.trim();
+      const prodi = document.getElementById("daftarProdi").value.trim();
+
+      if (!npm || !password || !nama || !prodi) {
+        tampilkanPesan("Semua kolom wajib diisi.");
+        return;
+      }
+
+      if (!/^\d+$/.test(npm)) {
+        tampilkanPesan("NPM hanya boleh angka.");
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("action", "daftar");
+      formData.append("npm", npm);
+      formData.append("password", password);
+      formData.append("nama", nama);
+      formData.append("prodi", prodi);
+
+      fetch(scriptURL, {
+        method: "POST",
+        body: formData
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          tampilkanPesan("Pendaftaran berhasil! Silakan login.", "success");
+          document.getElementById("daftarNPM").value = "";
+          document.getElementById("daftarPassword").value = "";
+          document.getElementById("daftarNama").value = "";
+          document.getElementById("daftarProdi").value = "";
+          showLogin();
+        } else {
+          tampilkanPesan(data.message || "Pendaftaran gagal.");
+        }
+      })
+      .catch(() => tampilkanPesan("Terjadi kesalahan saat mendaftar."));
+    }
+  </script>
+</body>
+</html>
