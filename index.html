@@ -1,353 +1,557 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Dashboard Joki Tugas</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-  <style>
-    body {
-      font-family: 'Inter', sans-serif;
-      background: linear-gradient(to bottom, #1e3c72, #2a5298);
-      min-height: 100vh;
-      transition: all 0.3s ease-in-out;
-    }
-    .icon-box {
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-    .icon-box:hover {
-      transform: translateY(-4px) scale(1.05);
-      box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
-    }
-    @keyframes slideDown {
-      from { opacity: 0; transform: translateY(-10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    .animate-slideDown {
-      animation: slideDown 0.4s ease-out;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SMM Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .transition-all {
+            transition: all 0.3s ease;
+        }
+    </style>
 </head>
-<body class="text-white">
-
-  <!-- Header -->
-  <div class="px-6 pt-8 pb-4 flex justify-between items-start">
-    <div>
-      <p id="userProdi" class="text-sm text-white/70"></p>
-      <h1 id="userName" class="text-2xl font-semibold">Mahasiswa</h1>
-    </div>
-    <div class="flex space-x-4 items-start text-sm">
-      <button class="text-xl hover:scale-110 transition">🔔</button>
-      <button onclick="logout()" class="underline hover:text-red-300 transition">Logout</button>
-    </div>
-  </div>
-
-  <!-- Info Joki -->
-<!-- Profil + Saldo -->
-<div class="mx-5 mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
-  <!-- Profil Mahasiswa -->
-  <div class="bg-white text-gray-800 rounded-2xl shadow-xl p-6">
-    <h2 class="text-lg font-semibold text-blue-700 mb-4">Profil Mahasiswa</h2>
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
-      <div><span class="font-medium text-gray-600">NPM:</span> <span id="profilNpm" class="font-bold text-gray-900"></span></div>
-      <div><span class="font-medium text-gray-600">Nama:</span> <span id="profilNama" class="font-bold text-gray-900"></span></div>
-      <div><span class="font-medium text-gray-600">Prodi:</span> <span id="profilProdi" class="font-bold text-gray-900"></span></div>
-      <div><span class="font-medium text-gray-600">No. WhatsApp:</span> <span id="profilWa" class="font-bold text-gray-900"></span></div>
-    </div>
-  </div>
-
-  <!-- Total Tagihan Aktif -->
-  <div class="bg-white text-gray-900 rounded-2xl shadow-2xl p-6 flex flex-col justify-between">
-    <div>
-      <p class="text-sm text-gray-500">Total Tagihan Aktif</p>
-      <div class="flex justify-between items-center mt-2">
-        <p id="saldoText" class="text-3xl font-bold text-blue-600">Rp0</p>
-        <button id="toggleSaldoBtn" class="text-blue-600 text-2xl hover:scale-110 transition">👁</button>
-      </div>
-    </div>
-    <div class="mt-3">
-      <a href="#" class="text-sm text-blue-500 font-semibold hover:underline">Lihat Semua Tugas →</a>
-    </div>
-  </div>
-</div>
-
-
-  <!-- Menu -->
-  <div class="bg-white mt-6 mx-5 rounded-2xl p-6 grid grid-cols-2 sm:grid-cols-4 gap-5 text-center shadow-md">
-    <div class="space-y-2 icon-box cursor-pointer" id="btnTambahTugas">
-      <div class="bg-blue-100 text-blue-600 p-4 rounded-full mx-auto text-xl shadow-inner">📝</div>
-      <p class="text-base font-bold text-gray-800">Tambah Tugas</p>
-    </div>
-    <div class="space-y-2 icon-box cursor-pointer" id="btnRiwayat">
-      <div class="bg-blue-100 text-blue-600 p-4 rounded-full mx-auto text-xl shadow-inner">📄</div>
-      <p class="text-base font-bold text-gray-800">Riwayat</p>
-    </div>
-    <div class="space-y-2 icon-box cursor-pointer" id="btnPembayaran">
-      <div class="bg-blue-100 text-blue-600 p-4 rounded-full mx-auto text-xl shadow-inner">💳</div>
-      <p class="text-base font-bold text-gray-800">Pembayaran</p>
-    </div>
-    <div class="space-y-2 icon-box cursor-pointer" id="btnPengaturan">
-      <div class="bg-blue-100 text-blue-600 p-4 rounded-full mx-auto text-xl shadow-inner">⚙️</div>
-      <p class="text-base font-bold text-gray-800">Pengaturan</p>
-    </div>
-  </div>
-
-  <!-- Form Tambah Tugas -->
-  <div id="formTambahTugas" class="hidden bg-white text-gray-800 mx-5 mb-10 mt-6 rounded-2xl shadow-xl p-6 transition-all duration-500">
-    <h2 class="text-lg font-semibold mb-4 text-blue-700">Form Tambah Tugas</h2>
-    <form class="space-y-4">
-      <div>
-        <label class="block text-sm font-medium mb-1">Jenis Tugas</label>
-        <select id="jenisTugas" name="jenisTugas" class="w-full p-2 border rounded-md bg-white text-gray-700" required>
-          <option value="" disabled selected>Pilih jenis tugas</option>
-          <option value="MAKALAH">MAKALAH</option>
-          <option value="PPT">PPT</option>
-          <option value="PPT PREMIUM">PPT PREMIUM</option>
-          <option value="KODING">KODING</option>
-          <option value="ANIMACY">ANIMACY</option>
-          <option value="WEBSITE">WEBSITE</option>
-          <option value="APLIKASI">APLIKASI</option>
-        </select>
-      </div>
-      <div>
-        <label class="block text-sm font-medium mb-1">Pilih Admin Joki</label>
-        <select id="adminSelect" name="adminSelect" class="w-full p-2 border rounded-md bg-white text-gray-700" required>
-          <option value="" disabled selected>Pilih admin</option>
-          <option value="RENALDI">RENALDI</option>
-          <option value="AFRIZAL">AFRIZAL</option>
-          <option value="ABDUL HAKIM">ABDUL HAKIM</option>
-          <option value="AIDIL ANWAR">AIDIL ANWAR</option>
-        </select>
-      </div>
-      <div>
-        <label class="block text-sm font-medium mb-1">Metode Pembayaran (Dana)</label>
-        <input id="metodePembayaran" type="text" class="w-full p-2 border rounded-md bg-gray-100 cursor-not-allowed" readonly />
-      </div>
-      <div><label class="block text-sm font-medium mb-1">Judul Tugas</label><input name="judul" type="text" class="w-full p-2 border rounded-md" placeholder="Masukkan judul tugas" required /></div>
-      <div><label class="block text-sm font-medium mb-1">Deskripsi</label><textarea name="deskripsi" class="w-full p-2 border rounded-md" rows="4" placeholder="Deskripsikan tugas..." required></textarea></div>
-      <div><label class="block text-sm font-medium mb-1">Nama Lengkap Dosen</label><input name="dosen" type="text" class="w-full p-2 border rounded-md" placeholder="Contoh: Dr. Ahmad Yusuf, M.Pd" required /></div>
-      <div><label class="block text-sm font-medium mb-1">Fakultas</label><input name="fakultas" type="text" class="w-full p-2 border rounded-md" placeholder="Contoh: Teknik, Hukum" required /></div>
-      <div><label class="block text-sm font-medium mb-1">Mata Kuliah</label><input name="matkul" type="text" class="w-full p-2 border rounded-md" placeholder="Contoh: Pemrograman Web" required /></div>
-      <div><label class="block text-sm font-medium mb-1">Deadline</label><input name="deadline" type="date" class="w-full p-2 border rounded-md" required /></div>
-      <div>
-        <label class="block text-sm font-medium mb-1">Harga (Rp)</label>
-        <div class="flex items-center bg-blue-100 text-blue-700 font-bold rounded-md px-4 py-3">
-          <span class="text-lg mr-2">💰</span>
-          <input id="hargaInput" name="harga" type="text" readonly class="bg-transparent text-xl w-full focus:outline-none cursor-not-allowed" />
+<body class="bg-gray-50 min-h-screen font-sans">
+    <!-- Auth Container - Default view -->
+    <div id="auth-container" class="flex flex-col items-center justify-center min-h-screen p-4">
+        <!-- Tabs -->
+        <div class="flex mb-8 bg-gray-200 rounded-xl p-1 max-w-md w-full">
+            <button id="login-tab" class="flex-1 py-3 px-4 font-medium rounded-lg focus:outline-none bg-blue-600 text-white">
+                Login
+            </button>
+            <button id="register-tab" class="flex-1 py-3 px-4 font-medium rounded-lg focus:outline-none text-gray-700">
+                Register
+            </button>
         </div>
-      </div>
-      <div><label class="block text-sm font-medium mb-1">Upload Bukti Pembayaran</label><input name="bukti" type="file" class="w-full p-2 border rounded-md bg-white" accept="image/*" required /></div>
-      <div class="pt-4"><button type="submit" class="w-full bg-blue-600 text-white py-2 rounded-md font-semibold hover:bg-blue-700 transition">Kirim Tugas</button></div>
-    </form>
-  </div>
-
-  <!-- Riwayat, Pembayaran, Pengaturan -->
-  <div id="riwayatTugasSection" class="hidden mx-5 my-8 text-gray-900">
-    <h2 class="text-lg font-semibold text-white mb-4">Riwayat Tugas</h2>
-    <div id="riwayatList" class="space-y-4"></div>
-  </div>
-
-  <div id="pembayaranSection" class="hidden mx-5 my-8 text-gray-900">
-    <h2 class="text-lg font-semibold text-white mb-4">Riwayat Pembayaran</h2>
-    <div id="pembayaranList" class="space-y-4"></div>
-  </div>
-
-  <div id="pengaturanSection" class="hidden mx-5 my-8 text-gray-900">
-    <h2 class="text-lg font-semibold text-white mb-4">Pengaturan Akun</h2>
-    <div class="bg-white rounded-xl shadow p-4 space-y-4 text-sm">
-      <div><label class="block font-medium mb-1">Nama</label><input id="namaPengguna" type="text" class="w-full p-2 border rounded-md" /></div>
-      <div><label class="block font-medium mb-1">Password Baru</label><input id="passwordBaru" type="password" class="w-full p-2 border rounded-md" placeholder="••••••••" /></div>
-      <button class="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition">Simpan Perubahan</button>
+        
+        <!-- Login Form -->
+        <div id="login-form" class="bg-white p-8 rounded-xl shadow-lg w-full max-w-md fade-in">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">Welcome Back!</h2>
+            <form id="login-form-content">
+                <div class="mb-4">
+                    <label for="login-email" class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                    <input type="email" id="login-email" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all" placeholder="your@email.com" required>
+                </div>
+                <div class="mb-6">
+                    <label for="login-password" class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                    <input type="password" id="login-password" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-blue-700 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
+                    Sign In
+                </button>
+                <div class="text-center mt-4">
+                    <a href="#" class="text-sm text-blue-600 hover:text-blue-800">Forgot password?</a>
+                </div>
+            </form>
+        </div>
+        
+        <!-- Register Form (Hidden by default) -->
+        <div id="register-form" class="bg-white p-8 rounded-xl shadow-lg w-full max-w-md fade-in hidden">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">Create Account</h2>
+            <form id="register-form-content">
+                <div class="mb-4">
+                    <label for="register-name" class="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
+                    <input type="text" id="register-name" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all" placeholder="John Doe" required>
+                </div>
+                <div class="mb-4">
+                    <label for="register-email" class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                    <input type="email" id="register-email" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all" placeholder="your@email.com" required>
+                </div>
+                <div class="mb-4">
+                    <label for="register-password" class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                    <input type="password" id="register-password" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all" placeholder="••••••••" required>
+                </div>
+                <div class="mb-6">
+                    <label for="register-confirm" class="block text-sm font-medium text-gray-700 mb-2">Confirm Password</label>
+                    <input type="password" id="register-confirm" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-blue-700 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
+                    Create Account
+                </button>
+                <div class="text-center mt-4">
+                    <p class="text-sm text-gray-600">Already have an account? <a href="#" id="show-login" class="text-blue-600 hover:text-blue-800">Sign In</a></p>
+                </div>
+            </form>
+        </div>
     </div>
-  </div>
-
-<script>
-    const scriptBaseURL = "https://script.google.com/macros/s/AKfycbwyY6rjfHnX3ScEKYQiYOx6AXH1Vq16qsxu3vQoCFExEmePvJyyCeLz7-zoF2ROkL1lYA/exec";
-    const npm = localStorage.getItem("npm");
-
-    let fullSaldo = "", saldoVisible = true;
-    const saldoText = document.getElementById("saldoText");
-    const toggleBtn = document.getElementById("toggleSaldoBtn");
-
-    function updateSaldo() {
-      fetch(`${scriptBaseURL}?action=getSaldo&npm=${npm}`)
-        .then(res => res.json())
-        .then(data => {
-          fullSaldo = "Rp" + (Number(data.saldo) || 0).toLocaleString("id-ID");
-          saldoText.textContent = fullSaldo;
-        }).catch(() => saldoText.textContent = "Rp0");
-    }
-
-    toggleBtn.onclick = () => {
-      saldoVisible = !saldoVisible;
-      saldoText.textContent = saldoVisible ? fullSaldo : "•••••••••";
-      toggleBtn.textContent = saldoVisible ? "👁" : "🙈";
-    };
-
-    // Load user data
-    fetch(`${scriptBaseURL}?action=getUser&npm=${npm}`)
-      .then(res => res.json())
-      .then(data => {
-        document.getElementById("userName").textContent = data.nama || "Mahasiswa";
-        document.getElementById("userProdi").textContent = data.prodi || "";
-        document.getElementById("namaPengguna").value = data.nama || "";
-      });
-
-      fetch(`${scriptBaseURL}?action=getUser&npm=${npm}`)
-  .then(res => res.json())
-  .then(data => {
-    document.getElementById("userName").textContent = data.nama || "Mahasiswa";
-    document.getElementById("userProdi").textContent = data.prodi || "";
-    document.getElementById("namaPengguna").value = data.nama || "";
-
-    // Isi bagian profil
-    document.getElementById("profilNpm").textContent = npm;
-    document.getElementById("profilNama").textContent = data.nama || "-";
-    document.getElementById("profilProdi").textContent = data.prodi || "-";
-    document.getElementById("profilWa").textContent = data.wa || "-";
-  });
-
-
-    // Harga dan admin
-    const hargaMap = { "MAKALAH": 25000, "PPT": 25000, "PPT PREMIUM": 50000, "KODING": 75000, "ANIMACY": 50000, "WEBSITE": 120000, "APLIKASI": 500000 };
-    const adminDanaMap = { "RENALDI": "081348722325", "AFRIZAL": "085182489261", "ABDUL HAKIM": "085764534425", "AIDIL ANWAR": "082279458613" };
-    document.getElementById("jenisTugas").onchange = e => {
-      const harga = hargaMap[e.target.value] || 0;
-      document.getElementById("hargaInput").value = "Rp " + harga.toLocaleString("id-ID");
-    };
-    document.getElementById("adminSelect").onchange = e => {
-      document.getElementById("metodePembayaran").value = adminDanaMap[e.target.value] || "";
-    };
-
-    // Navigasi antar bagian
-    const sections = {
-      formTambahTugas: document.getElementById("formTambahTugas"),
-      riwayat: document.getElementById("riwayatTugasSection"),
-      pembayaran: document.getElementById("pembayaranSection"),
-      pengaturan: document.getElementById("pengaturanSection"),
-    };
-    function hideAll() { for (const s in sections) sections[s].classList.add("hidden"); }
-    document.getElementById("btnTambahTugas").onclick = () => {
-      hideAll(); sections.formTambahTugas.classList.remove("hidden");
-      sections.formTambahTugas.scrollIntoView({ behavior: "smooth" });
-    };
-    document.getElementById("btnRiwayat").onclick = () => {
-      hideAll(); sections.riwayat.classList.remove("hidden");
-      sections.riwayat.scrollIntoView({ behavior: "smooth" });
-      fetchRiwayatTugas();
-    };
-    document.getElementById("btnPembayaran").onclick = () => {
-      hideAll(); sections.pembayaran.classList.remove("hidden");
-      sections.pembayaran.scrollIntoView({ behavior: "smooth" });
-      fetchPembayaran();
-    };
-    document.getElementById("btnPengaturan").onclick = () => {
-      hideAll(); sections.pengaturan.classList.remove("hidden");
-      sections.pengaturan.scrollIntoView({ behavior: "smooth" });
-      document.getElementById("namaPengguna").value = document.getElementById("userName").textContent;
-    };
-
-    // Submit Form Tambah Tugas
-    document.querySelector("#formTambahTugas form").addEventListener("submit", e => {
-      e.preventDefault();
-      const form = e.target;
-      const formData = new FormData(form);
-      formData.append("action", "tambahTugas");
-      formData.append("npm", npm);
-      if (!formData.get("harga")) {
-        alert("Silakan pilih jenis tugas.");
-        return;
-      }
-      const submitBtn = form.querySelector("button[type=submit]");
-      submitBtn.disabled = true;
-      submitBtn.textContent = "Mengirim...";
-      fetch(scriptBaseURL, { method: "POST", body: formData }).then(() => {
-        alert("Tugas berhasil dikirim!");
-        form.reset();
-        document.getElementById("hargaInput").value = "";
-        document.getElementById("metodePembayaran").value = "";
-        hideAll();
-        fetchRiwayatTugas();
-        updateSaldo();
-      }).finally(() => {
-        submitBtn.disabled = false;
-        submitBtn.textContent = "Kirim Tugas";
-      });
-    });
-
-    // Update Pengaturan
-    document.querySelector("#pengaturanSection button").onclick = () => {
-      const nama = document.getElementById("namaPengguna").value.trim();
-      const password = document.getElementById("passwordBaru").value.trim();
-      if (!nama || !password) return alert("Isi nama dan password baru.");
-      fetch(scriptBaseURL, {
-        method: "POST",
-        body: new URLSearchParams({ action: "updateUser", npm, nama, password })
-      }).then(() => {
-        alert("Perubahan berhasil disimpan.");
-        location.reload();
-      });
-    };
-
-    // Riwayat dan Pembayaran
-    function fetchRiwayatTugas() {
-      const list = document.getElementById("riwayatList");
-      list.innerHTML = "<div class='flex justify-center'><div class='animate-spin h-6 w-6 border-4 border-blue-500 border-t-transparent rounded-full'></div></div>";
-      fetch(`${scriptBaseURL}?action=riwayat&npm=${npm}`).then(res => res.json()).then(data => {
-        list.innerHTML = "";
-        if (!data || !data.length) return list.innerHTML = "<p class='text-white'>Belum ada riwayat tugas.</p>";
-        data.forEach(item => {
-          const el = document.createElement("div");
-          el.className = "bg-white rounded-xl shadow p-4 text-sm text-gray-800";
-          el.innerHTML = `
-            <div class="flex justify-between items-center mb-2">
-              <span class="font-bold text-blue-600">${item.jenis}</span>
-              <span class="px-2 py-1 rounded-full text-xs ${getStatusColor(item.status)}">${item.status}</span>
+    
+    <!-- Dashboard Container (Hidden by default) -->
+    <div id="dashboard-container" class="hidden min-h-screen">
+        <!-- Sidebar -->
+        <div class="fixed inset-y-0 left-0 w-64 bg-gray-900 text-white shadow-lg">
+            <div class="flex items-center justify-center h-16 px-4 border-b border-gray-800">
+                <div class="flex items-center">
+                    <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/7ed004f2-2005-47d4-a698-217fbaf34ed7.png" alt="SMM Dashboard logo showing a stylized social media graph" class="h-8 w-8 rounded-full">
+                    <span class="ml-3 text-xl font-semibold">SMM Dashboard</span>
+                </div>
             </div>
-            <p class="font-semibold">${item.judul}</p>
-            <p class="text-gray-500">Deadline: ${item.deadline}</p>
-            <p class="text-gray-500">Admin: ${item.admin}</p>`;
-          list.appendChild(el);
+            <nav class="mt-6">
+                <div class="px-4 mb-8">
+                    <div class="flex items-center bg-gray-800 py-2 px-3 rounded-lg">
+                        <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/3e5ee43d-c1e9-4795-a807-91f4aa9433f3.png" id="user-avatar" alt="User profile picture placeholder" class="h-10 w-10 rounded-full">
+                        <div class="ml-3">
+                            <p class="text-sm font-medium" id="user-name">John Doe</p>
+                            <p class="text-xs text-gray-400" id="user-email">john@example.com</p>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <a href="#" class="flex items-center px-4 py-3 text-gray-300 hover:bg-gray-800 transition-all">
+                        <span class="mr-3">📊</span>
+                        <span class="font-medium">Dashboard</span>
+                    </a>
+                    <a href="#" class="flex items-center px-4 py-3 text-gray-300 hover:bg-gray-800 transition-all">
+                        <span class="mr-3">📅</span>
+                        <span class="font-medium">Scheduler</span>
+                    </a>
+                    <a href="#" class="flex items-center px-4 py-3 text-gray-300 hover:bg-gray-800 transition-all">
+                        <span class="mr-3">📈</span>
+                        <span class="font-medium">Analytics</span>
+                    </a>
+                    <a href="#" class="flex items-center px-4 py-3 text-gray-300 hover:bg-gray-800 transition-all">
+                        <span class="mr-3">✉️</span>
+                        <span class="font-medium">Messages</span>
+                    </a>
+                    <div class="px-4 py-2 mt-4 border-t border-gray-800">
+                        <a href="#" id="logout-btn" class="flex items-center px-2 py-2 text-gray-300 hover:bg-gray-800 rounded transition-all">
+                            <span class="mr-3">🚪</span>
+                            <span class="font-medium">Logout</span>
+                        </a>
+                    </div>
+                </div>
+            </nav>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="ml-64">
+            <!-- Top Navigation -->
+            <header class="flex items-center justify-between h-16 px-6 bg-white shadow-sm">
+                <div class="flex items-center">
+                    <button id="mobile-menu-button" class="p-2 rounded-md text-gray-500 hover:text-gray-600 hover:bg-gray-100 focus:outline-none mr-2 md:hidden">
+                        <span>☰</span>
+                    </button>
+                    <h2 class="text-lg font-medium text-gray-800">Dashboard</h2>
+                </div>
+                <div class="flex items-center">
+                    <button class="p-2 rounded-full text-gray-500 hover:text-gray-600 hover:bg-gray-100 focus:outline-none">
+                        <span>🔔</span>
+                    </button>
+                    <button class="p-2 rounded-full text-gray-500 hover:text-gray-600 hover:bg-gray-100 focus:outline-none ml-2">
+                        <span>⚙️</span>
+                    </button>
+                </div>
+            </header>
+            
+            <!-- Dashboard Content -->
+            <main class="p-6">
+                <!-- Stats Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    <div class="bg-white rounded-xl shadow-sm p-6 card-hover transition-all">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm font-medium text-gray-500">Followers</p>
+                                <h3 class="text-2xl font-bold text-gray-800 mt-1">24,532</h3>
+                                <p class="text-sm text-green-500 mt-2 flex items-center">
+                                    <span>↑ 12.4%</span>
+                                    <span class="ml-1">from last month</span>
+                                </p>
+                            </div>
+                            <div class="bg-blue-100 p-3 rounded-full">
+                                <span>👥</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-xl shadow-sm p-6 card-hover transition-all">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm font-medium text-gray-500">Engagement</p>
+                                <h3 class="text-2xl font-bold text-gray-800 mt-1">8.2%</h3>
+                                <p class="text-sm text-green-500 mt-2 flex items-center">
+                                    <span>↑ 3.2%</span>
+                                    <span class="ml-1">from last month</span>
+                                </p>
+                            </div>
+                            <div class="bg-purple-100 p-3 rounded-full">
+                                <span>💬</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-xl shadow-sm p-6 card-hover transition-all">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm font-medium text-gray-500">Posts</p>
+                                <h3 class="text-2xl font-bold text-gray-800 mt-1">62</h3>
+                                <p class="text-sm text-green-500 mt-2 flex items-center">
+                                    <span>↑ 18.7%</span>
+                                    <span class="ml-1">from last month</span>
+                                </p>
+                            </div>
+                            <div class="bg-green-100 p-3 rounded-full">
+                                <span>📌</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-xl shadow-sm p-6 card-hover transition-all">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm font-medium text-gray-500">Revenue</p>
+                                <h3 class="text-2xl font-bold text-gray-800 mt-1">$2,845</h3>
+                                <p class="text-sm text-green-500 mt-2 flex items-center">
+                                    <span>↑ 24.1%</span>
+                                    <span class="ml-1">from last month</span>
+                                </p>
+                            </div>
+                            <div class="bg-yellow-100 p-3 rounded-full">
+                                <span>💰</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Charts Section -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+                    <div class="bg-white rounded-xl shadow-sm p-6 lg:col-span-2 card-hover transition-all">
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 class="text-lg font-medium text-gray-800">Engagement Rate</h3>
+                            <div class="flex">
+                                <button class="text-xs bg-gray-100 hover:bg-gray-200 px-3 py-1 rounded-md mr-2 transition-all">7 Days</button>
+                                <button class="text-xs bg-blue-100 text-blue-600 hover:bg-blue-200 px-3 py-1 rounded-md mr-2 transition-all">30 Days</button>
+                                <button class="text-xs bg-gray-100 hover:bg-gray-200 px-3 py-1 rounded-md transition-all">90 Days</button>
+                            </div>
+                        </div>
+                        <!-- Chart placeholder -->
+                        <div class="bg-gray-100 rounded-lg h-64 flex items-center justify-center">
+                            <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/c6fed9e2-16d0-418d-8c63-aaa0fb94098c.png" alt="Placeholder for engagement rate chart showing line graph over time" class="w-full h-full object-cover rounded-lg">
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-xl shadow-sm p-6 card-hover transition-all">
+                        <h3 class="text-lg font-medium text-gray-800 mb-6">Platform Distribution</h3>
+                        <!-- Pie chart placeholder -->
+                        <div class="bg-gray-100 rounded-lg h-64 flex items-center justify-center">
+                            <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/4493b472-513b-4a24-8e08-57c12b1d28eb.png" alt="Placeholder for platform distribution pie chart with Instagram, Facebook, Twitter, and LinkedIn segments" class="w-full h-full object-cover rounded-lg">
+                        </div>
+                        <div class="mt-4">
+                            <div class="flex items-center justify-between mb-2">
+                                <div class="flex items-center">
+                                    <div class="w-3 h-3 bg-blue-500 rounded-full mr-2"></div>
+                                    <span class="text-sm">Instagram</span>
+                                </div>
+                                <span class="text-sm font-medium">42%</span>
+                            </div>
+                            <div class="flex items-center justify-between mb-2">
+                                <div class="flex items-center">
+                                    <div class="w-3 h-3 bg-purple-500 rounded-full mr-2"></div>
+                                    <span class="text-sm">Facebook</span>
+                                </div>
+                                <span class="text-sm font-medium">28%</span>
+                            </div>
+                            <div class="flex items-center justify-between mb-2">
+                                <div class="flex items-center">
+                                    <div class="w-3 h-3 bg-green-500 rounded-full mr-2"></div>
+                                    <span class="text-sm">Twitter</span>
+                                </div>
+                                <span class="text-sm font-medium">18%</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <div class="w-3 h-3 bg-yellow-500 rounded-full mr-2"></div>
+                                    <span class="text-sm">LinkedIn</span>
+                                </div>
+                                <span class="text-sm font-medium">12%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Recent Posts -->
+                <div class="bg-white rounded-xl shadow-sm p-6 card-hover transition-all mb-8">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-lg font-medium text-gray-800">Recent Posts</h3>
+                        <button class="text-sm text-blue-600 hover:text-blue-800 font-medium transition-all">View All →</button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Platform</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Content</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Published</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Engagement</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="flex items-center">
+                                            <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                                                <span>📸</span>
+                                            </div>
+                                            <span class="ml-2">Instagram</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 text-sm text-gray-500">
+                                        <div class="text-gray-900 font-medium">Product Launch Ann...</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2 hours ago</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm text-gray-900">1.4k</div>
+                                        <div class="text-xs text-green-500">+24.5%</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">Active</span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                        <a href="#" class="text-blue-600 hover:text-blue-900 mr-3">Analytics</a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="flex items-center">
+                                            <div class="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
+                                                <span>👍</span>
+                                            </div>
+                                            <span class="ml-2">Facebook</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 text-sm text-gray-500">
+                                        <div class="text-gray-900 font-medium">Customer Testimonia...</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">1 day ago</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm text-gray-900">856</div>
+                                        <div class="text-xs text-green-500">+18.2%</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">Active</span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                        <a href="#" class="text-blue-600 hover:text-blue-900 mr-3">Analytics</a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="flex items-center">
+                                            <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                                                <span>🐦</span>
+                                            </div>
+                                            <span class="ml-2">Twitter</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 text-sm text-gray-500">
+                                        <div class="text-gray-900 font-medium">Industry Trends...</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">3 days ago</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm text-gray-900">1.2k</div>
+                                        <div class="text-xs text-green-500">+32.1%</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">Active</span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                        <a href="#" class="text-blue-600 hover:text-blue-900 mr-3">Analytics</a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Quick Actions -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <button class="bg-white rounded-xl shadow-sm p-4 flex flex-col items-center justify-center hover:shadow-md transition-all card-hover">
+                        <div class="bg-blue-100 p-3 rounded-full mb-3">
+                            <span>📝</span>
+                        </div>
+                        <h4 class="font-medium text-gray-800 mb-1">New Post</h4>
+                        <p class="text-xs text-gray-500 text-center">Create content for social media</p>
+                    </button>
+                    <button class="bg-white rounded-xl shadow-sm p-4 flex flex-col items-center justify-center hover:shadow-md transition-all card-hover">
+                        <div class="bg-purple-100 p-3 rounded-full mb-3">
+                            <span>📅</span>
+                        </div>
+                        <h4 class="font-medium text-gray-800 mb-1">Schedule</h4>
+                        <p class="text-xs text-gray-500 text-center">Plan content calendar</p>
+                    </button>
+                    <button class="bg-white rounded-xl shadow-sm p-4 flex flex-col items-center justify-center hover:shadow-md transition-all card-hover">
+                        <div class="bg-green-100 p-3 rounded-full mb-3">
+                            <span>📊</span>
+                        </div>
+                        <h4 class="font-medium text-gray-800 mb-1">Reports</h4>
+                        <p class="text-xs text-gray-500 text-center">Generate performance report</p>
+                    </button>
+                    <button class="bg-white rounded-xl shadow-sm p-4 flex flex-col items-center justify-center hover:shadow-md transition-all card-hover">
+                        <div class="bg-yellow-100 p-3 rounded-full mb-3">
+                            <span>👥</span>
+                        </div>
+                        <h4 class="font-medium text-gray-800 mb-1">Audience</h4>
+                        <p class="text-xs text-gray-500 text-center">View audience insights</p>
+                    </button>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const authContainer = document.getElementById('auth-container');
+        const dashboardContainer = document.getElementById('dashboard-container');
+        const loginTab = document.getElementById('login-tab');
+        const registerTab = document.getElementById('register-tab');
+        const loginForm = document.getElementById('login-form');
+        const registerForm = document.getElementById('register-form');
+        const showLoginLink = document.getElementById('show-login');
+        const loginFormContent = document.getElementById('login-form-content');
+        const registerFormContent = document.getElementById('register-form-content');
+        const logoutBtn = document.getElementById('logout-btn');
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const sidebar = document.querySelector('nav');
+        
+        // User data placeholders
+        const userName = document.getElementById('user-name');
+        const userEmail = document.getElementById('user-email');
+        const userAvatar = document.getElementById('user-avatar');
+        
+        // Toggle between login and register forms
+        function showLogin() {
+            loginTab.classList.add('bg-blue-600', 'text-white');
+            loginTab.classList.remove('text-gray-700');
+            registerTab.classList.remove('bg-blue-600', 'text-white');
+            registerTab.classList.add('text-gray-700');
+            loginForm.classList.remove('hidden');
+            registerForm.classList.add('hidden');
+        }
+        
+        function showRegister() {
+            registerTab.classList.add('bg-blue-600', 'text-white');
+            registerTab.classList.remove('text-gray-700');
+            loginTab.classList.remove('bg-blue-600', 'text-white');
+            loginTab.classList.add('text-gray-700');
+            registerForm.classList.remove('hidden');
+            loginForm.classList.add('hidden');
+        }
+        
+        // Toggle mobile menu
+        function toggleMobileMenu() {
+            sidebar.classList.toggle('hidden');
+        }
+        
+        // Event Listeners
+        loginTab.addEventListener('click', showLogin);
+        registerTab.addEventListener('click', showRegister);
+        showLoginLink.addEventListener('click', showLogin);
+        mobileMenuButton.addEventListener('click', toggleMobileMenu);
+        
+        // Handle login
+        loginFormContent.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            
+            // Simple validation
+            if (email && password) {
+                // In a real app, you would make an API call here
+                // For demo purposes, we'll just simulate a successful login
+                simulateLogin(email);
+            } else {
+                alert('Please fill in all fields');
+            }
         });
-      });
-    }
-
-    function fetchPembayaran() {
-      const list = document.getElementById("pembayaranList");
-      list.innerHTML = "<div class='flex justify-center'><div class='animate-spin h-6 w-6 border-4 border-blue-500 border-t-transparent rounded-full'></div></div>";
-      fetch(`${scriptBaseURL}?action=pembayaran&npm=${npm}`).then(res => res.json()).then(data => {
-        list.innerHTML = "";
-        if (!data || !data.length) return list.innerHTML = "<p class='text-white'>Belum ada data pembayaran.</p>";
-        data.forEach(item => {
-          const el = document.createElement("div");
-          el.className = "bg-white rounded-xl shadow p-4 text-sm text-gray-800";
-          el.innerHTML = `
-            <div class="flex justify-between mb-2">
-              <span class="font-semibold text-blue-600">${item.metode}</span>
-              <span class="text-xs text-gray-500">${item.tanggal}</span>
-            </div>
-            <p>Jumlah: <span class="font-bold text-green-600">${item.jumlah}</span></p>
-            <p>Status: <span class="font-semibold">${item.status}</span></p>`;
-          list.appendChild(el);
+        
+        // Handle register
+        registerFormContent.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const name = document.getElementById('register-name').value;
+            const email = document.getElementById('register-email').value;
+            const password = document.getElementById('register-password').value;
+            const confirm = document.getElementById('register-confirm').value;
+            
+            // Validation
+            if (!name || !email || !password || !confirm) {
+                alert('Please fill in all fields');
+                return;
+            }
+            
+            if (password !== confirm) {
+                alert('Passwords do not match');
+                return;
+            }
+            
+            // In a real app, you would make an API call here
+            // For demo purposes, we'll just simulate registration and login
+            simulateRegisterAndLogin(name, email);
         });
-      });
-    }
-
-    function getStatusColor(status) {
-      status = status.toLowerCase();
-      if (status === "selesai") return "bg-green-100 text-green-700";
-      if (status === "diproses") return "bg-yellow-100 text-yellow-700";
-      if (status === "batal") return "bg-red-100 text-red-700";
-      return "bg-gray-100 text-gray-700";
-    }
-
-    function logout() {
-      localStorage.clear();
-      window.location.href = "botjokitugas.html";
-    }
-
-    updateSaldo();
-  </script>
+        
+        // Handle logout
+        logoutBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            authContainer.classList.remove('hidden');
+            dashboardContainer.classList.add('hidden');
+        });
+        
+        // Simulate login
+        function simulateLogin(email) {
+            // Mock user data
+            const mockUser = {
+                name: email.split('@')[0],
+                email: email,
+                avatar: 'https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/fd05793d-70f5-4b57-968f-026baeed59f9.png'
+            };
+            
+            // Update UI with user data
+            userName.textContent = mockUser.name;
+            userEmail.textContent = mockUser.email;
+            userAvatar.src = mockUser.avatar;
+            
+            // Show dashboard
+            authContainer.classList.add('hidden');
+            dashboardContainer.classList.remove('hidden');
+        }
+        
+        // Simulate registration and login
+        function simulateRegisterAndLogin(name, email) {
+            // Mock user data
+            const mockUser = {
+                name: name,
+                email: email,
+                avatar: 'https://placehold.co/200x200'
+            };
+            
+            // Update UI with user data
+            userName.textContent = mockUser.name;
+            userEmail.textContent = mockUser.email;
+            userAvatar.src = mockUser.avatar;
+            
+            // Show dashboard
+            authContainer.classList.add('hidden');
+            dashboardContainer.classList.remove('hidden');
+            
+            // Show success message
+            setTimeout(() => {
+                alert('Registration successful! You are now logged in.');
+            }, 100);
+        }
+        
+        // Initialize
+        showLogin();
+    </script>
 </body>
 </html>
+
